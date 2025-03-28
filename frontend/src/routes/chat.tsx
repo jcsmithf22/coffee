@@ -115,7 +115,7 @@ function RouteComponent() {
   const rootRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const [state, setState] = useState<{
+  const [store, _setStore] = useState<{
     prompt: LanguageModelV1Prompt;
     isProcessing: boolean;
     rate: boolean;
@@ -126,11 +126,135 @@ function RouteComponent() {
   });
 
   function setStore(key: string, value: any) {
-    setState((prev) => ({ ...prev, [key]: value }));
+    _setStore((prev) => ({ ...prev, [key]: value }));
   }
 
   function clearConversation() {
     setStore("prompt", getInitialPrompt());
+  }
+
+  async function send(message: string) {
+    setStore("isProcessing", true);
+    setStore("prompt", store.prompt.length, {
+      role: "user",
+      content: [
+        {
+          type: "text",
+          text: message,
+          providerMetadata: store.prompt.length === 1 ? providerMetadata : {},
+        },
+      ],
+    });
+
+    while (true) {
+      if (!store.isProcessing) {
+        console.log("Processing cancelled by user");
+        break;
+      }
+
+      const response = await client.generate.$post({
+        json: {
+          prompt: store.prompt,
+          mode: {
+            type: "regular",
+            tools: tools.map((tool: any) => ({
+              type: "function",
+              name: tool.name,
+              description: tool.description,
+              parameters: {
+                ...tool.inputSchema,
+              },
+            })),
+          },
+          inputFormat: "messages",
+          temperature: 1,
+        },
+      });
+
+      if (!store.isProcessing) continue;
+
+      if (!response.ok) {
+        if (response.status === 400) {
+          setStore("prompt", (val) => {
+            val.splice(2, 1);
+            console.log(val);
+            return [...val];
+          });
+        }
+        if (response.status === 429) {
+          setStore("rate", true);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        continue;
+      }
+
+      const result = await response.json();
+
+      if (result.text) {
+        setStore("prompt", store.prompt.length, {
+          role: "assistant",
+          content: [
+            {
+              type: "text",
+              text: result.text,
+            },
+          ],
+        });
+      }
+
+      setStore("rate", false);
+
+      if (result.finishReason === "stop") {
+        setStore("isProcessing", false);
+        break;
+      }
+
+      if (result.finishReason === "tool-calls") {
+        for (const item of result.toolCalls!) {
+          console.log("calling tool", item.toolName, item.args);
+          setStore("prompt", store.prompt.length, {
+            role: "assistant",
+            content: [
+              {
+                type: "tool-call",
+                toolName: item.toolName,
+                args: JSON.parse(item.args),
+                toolCallId: item.toolCallId,
+              },
+            ],
+          });
+
+          const response = await client.mcp
+            .$post({
+              json: {
+                jsonrpc: "2.0",
+                id: "2",
+                method: "tools/call",
+                params: {
+                  name: item.toolName,
+                  arguments: JSON.parse(item.args),
+                },
+              },
+            })
+            .then((r) => r.json());
+          if ("content" in response.result) {
+            setStore("prompt", store.prompt.length, {
+              role: "tool",
+              content: [
+                {
+                  type: "tool-result",
+                  toolName: item.toolName,
+                  toolCallId: item.toolCallId,
+                  result: response.result.content,
+                },
+              ],
+            });
+          } else break;
+        }
+      }
+    }
+    setStore("isProcessing", false);
+    textarea?.focus();
   }
 
   return <div>Hi</div>;
