@@ -1,0 +1,229 @@
+SDK INFORMATION
+
+List products
+List all products for sale in the Terminal shop.
+
+  const product = await client.product.list();
+
+  console.log(product.data);
+
+Get a product
+Get a product by ID from the Terminal shop.
+
+  const product = await client.product.get('prd_XXXXXXXXXXXXXXXXXXXXXXXXX');
+
+  console.log(product.data);
+
+Get user profile
+Get the current user's profile.
+
+  const response = await client.profile.me();
+
+  console.log(response.data);
+  
+Update user profile
+Update the current user's profile.
+
+  const profile = await client.profile.update({ email: 'john@example.com', name: 'John Doe' });
+
+  console.log(profile.data);
+
+Get addresses
+Get the shipping addresses associated with the current user.
+  const address = await client.address.list();
+
+  console.log(address.data);
+
+Get an address
+Get the shipping address with the given ID.
+
+  const address = await client.address.get('shp_XXXXXXXXXXXXXXXXXXXXXXXXX');
+
+  console.log(address.data);
+
+Create an address
+Create and add a shipping address to the current user.
+
+  const address = await client.address.create({
+      city: 'Anytown',
+      country: 'US',
+      name: 'John Doe',
+      street1: '123 Main St',
+      zip: '12345',
+    });
+
+  console.log(address.data);
+
+Delete an address
+Delete a shipping address from the current user.
+
+  const address = await client.address.delete('shp_XXXXXXXXXXXXXXXXXXXXXXXXX');
+
+  console.log(address.data);
+
+List cards
+Get a credit card by ID associated with the current user.
+
+  const card = await client.card.list();
+
+  console.log(card.data);
+
+Get card
+Get a credit card by ID associated with the current user.
+
+  const card = await client.card.get('crd_XXXXXXXXXXXXXXXXXXXXXXXXX');
+
+  console.log(card.data);
+
+Create card
+Attach a credit card (tokenized via Stripe) to the current user.
+  const card = await client.card.create({ token: 'tok_1N3T00LkdIwHu7ixt44h1F8k' });
+
+  console.log(card.data);
+
+Collect card
+Create a temporary URL for collecting credit card information for the current user.
+
+  const response = await client.card.collect();
+
+  console.log(response.data);
+
+Get cart
+Get the current user's cart.
+
+  const cart = await client.cart.get();
+
+  console.log(cart.data);
+
+Add item
+Add an item to the current user's cart.
+
+  const response = await client.cart.setItem({
+    productVariantID: 'var_XXXXXXXXXXXXXXXXXXXXXXXXX',
+    quantity: 2,
+  });
+
+  console.log(response.data);
+
+Set address
+Set the shipping address for the current user's cart.
+
+  const response = await client.cart.setAddress({ addressID: 'shp_XXXXXXXXXXXXXXXXXXXXXXXXX' });
+
+  console.log(response.data);
+
+Set card
+Set the credit card for the current user's cart.
+
+  const response = await client.cart.setCard({ cardID: 'crd_XXXXXXXXXXXXXXXXXXXXXXXXX' });
+
+  console.log(response.data);
+
+Convert to order
+Convert the current user's cart to an order.
+
+  const response = await client.cart.convert();
+
+  console.log(response.data);
+
+Clear cart
+clear the current user's cart
+
+  const response = await client.cart.clear();
+
+  console.log(response.data);
+
+List orders
+list the orders associated with the current user
+
+  const order = await client.order.list();
+
+  console.log(order.data);
+
+Get order
+get the order with the given id
+
+  const order = await client.order.get('ord_XXXXXXXXXXXXXXXXXXXXXXXXX');
+
+  console.log(order.data);
+
+Create order
+create an order without a card. The order will be placed immediately. Do not do this before verifying that the user wants to bypass the cart.
+
+  const order = await client.order.create({
+    addressID: 'shp_XXXXXXXXXXXXXXXXXXXXXXXXX',
+    cardID: 'crd_XXXXXXXXXXXXXXXXXXXXXXXXX',
+    variants: { var_XXXXXXXXXXXXXXXXXXXXXXXXX: 1 },
+  });
+
+  console.log(order.data);
+
+List subscriptions
+list the subscriptions associated with the current user.
+
+  const subscription = await client.subscription.list();
+
+  console.log(subscription.data);
+
+Get subscription
+get the subscription with the given id
+
+  const subscription = await client.subscription.get('sub_XXXXXXXXXXXXXXXXXXXXXXXXX');
+
+  console.log(subscription.data);
+
+Subscribe
+Create a subscription for the current user.
+
+  const subscription = await client.subscription.create({
+    id: 'sub_XXXXXXXXXXXXXXXXXXXXXXXXX',
+    addressID: 'shp_XXXXXXXXXXXXXXXXXXXXXXXXX',
+    cardID: 'crd_XXXXXXXXXXXXXXXXXXXXXXXXX',
+    productVariantID: 'var_XXXXXXXXXXXXXXXXXXXXXXXXX',
+    quantity: 1,
+  });
+
+  console.log(subscription.data);
+
+Cancel
+cancel a subscription for the current user.
+
+  const subscription = await client.subscription.delete('sub_XXXXXXXXXXXXXXXXXXXXXXXXX');
+
+  console.log(subscription.data);
+
+List tokens
+list the current user's personal access tokens.
+
+  const token = await client.token.list();
+
+  console.log(token.data);
+
+Get token
+get the personal access token with the given id.
+
+  const token = await client.token.get('pat_XXXXXXXXXXXXXXXXXXXXXXXXX');
+
+  console.log(token.data);
+
+Create token
+create a personal access token.
+
+  const token = await client.token.create();
+
+  console.log(token.data);
+
+Delete token
+delete the personal access token with the given id.
+
+  const token = await client.token.delete('pat_XXXXXXXXXXXXXXXXXXXXXXXXX');
+
+  console.log(token.data);
+
+Subscribe email
+subscribe to email updates from terminal.
+
+  const email = await client.email.create({ email: 'john@example.com' });
+
+  console.log(email.data);
+
