@@ -83,6 +83,14 @@ export const Route = createFileRoute("/chat")({
   component: RouteComponent,
 });
 
+const providerMetadata = {
+  anthropic: {
+    cacheControl: {
+      type: "ephemeral",
+    },
+  },
+};
+
 // Define initial system messages once
 const getInitialPrompt = (): LanguageModelV1Prompt => [
   {
@@ -125,8 +133,40 @@ function RouteComponent() {
     isProcessing: false,
   });
 
-  function setStore(key: string, value: any) {
-    _setStore((prev) => ({ ...prev, [key]: value }));
+  function setStore<K extends keyof typeof store>(
+    key: K,
+    valueOrIndex: any,
+    value?: any
+  ) {
+    _setStore((prev) => {
+      // Handle 2-parameter case (direct replacement)
+      if (value === undefined) {
+        return { ...prev, [key]: valueOrIndex };
+      }
+
+      // Handle 3-parameter case (array update)
+      const currentValue = prev[key];
+      let newArray: any[];
+
+      // Convert to array if not already one
+      if (!Array.isArray(currentValue)) {
+        newArray = currentValue !== undefined ? [currentValue] : [];
+      } else {
+        newArray = [...currentValue];
+      }
+
+      // Handle index bounds
+      const index = Math.max(0, Math.floor(valueOrIndex));
+      if (index >= newArray.length) {
+        // Expand array if index beyond length
+        newArray.length = index + 1;
+      }
+
+      // Update value at index
+      newArray[index] = value;
+
+      return { ...prev, [key]: newArray };
+    });
   }
 
   function clearConversation() {
