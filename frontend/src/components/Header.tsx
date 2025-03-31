@@ -9,9 +9,6 @@ export default function Header() {
           <Link preload={false} to="/chat">
             Chat
           </Link>
-          <Link preload={false} to="/new">
-            New
-          </Link>
         </div>
       </nav>
     </header>

@@ -9,23 +9,34 @@ interface ToolCallMessageProps {
   results?: any;
 }
 
-export default function ToolCallMessage({ toolName, args, results }: ToolCallMessageProps) {
+export default function ToolCallMessage({
+  toolName,
+  args,
+  results,
+}: ToolCallMessageProps) {
   const [showArgs, setShowArgs] = useState(false);
 
   const toggleArgs = () => {
-    setShowArgs(prev => !prev);
+    setShowArgs((prev) => !prev);
   };
 
   return (
     <div className="mb-4">
       <div>
-        <div className="inset-shadow-sm bg-muted rounded-2xl cursor-pointer w-fit px-3 py-1.5 flex items-center" onClick={toggleArgs}>
+        <div
+          className="inset-shadow-sm bg-muted rounded-2xl cursor-pointer w-fit px-3 py-1.5 flex items-center"
+          onClick={toggleArgs}
+        >
           <span>🔧</span>
-          <span className="ml-2 text-sm text-muted-foreground">
-            {toolName}
-          </span>
+          <span className="ml-2 text-sm text-muted-foreground">{toolName}</span>
           <span className="ml-2">
-            <ChevronDown size={16} className={cn("transition-transform duration-300", showArgs || "-rotate-180")} />
+            <ChevronDown
+              size={16}
+              className={cn(
+                "transition-transform duration-300",
+                showArgs || "-rotate-180"
+              )}
+            />
           </span>
         </div>
       </div>
@@ -37,29 +48,19 @@ export default function ToolCallMessage({ toolName, args, results }: ToolCallMes
             exit={{ height: 0 }}
             className="overflow-hidden"
           >
-            <div
-              className="inset-shadow-sm bg-muted rounded-2xl cursor-pointer px-3 py-1.5 flex flex-col gap-2 w-full mt-2 text-xs overflow-y-scroll">
-              <span className="text-sm text-muted-foreground">
-                Arguments
-              </span>
-              <pre>
-                {JSON.stringify(args, null, 2)}
-              </pre>
+            <div className="inset-shadow-sm bg-muted rounded-2xl cursor-pointer px-3 py-1.5 flex flex-col gap-2 w-full mt-2 text-xs overflow-x-scroll overflow-y-hidden">
+              <span className="text-sm text-muted-foreground">Arguments</span>
+              <pre>{JSON.stringify(args, null, 2)}</pre>
               {results && (
                 <>
-                  <span className="text-sm text-muted-foreground">
-                    Results
-                  </span>
-                  <pre>
-                    {JSON.stringify(results, null, 2)}
-                  </pre>
+                  <span className="text-sm text-muted-foreground">Results</span>
+                  <pre>{JSON.stringify(results, null, 2)}</pre>
                 </>
               )}
             </div>
           </motion.div>
-        )
-        }
+        )}
       </AnimatePresence>
-    </div >
+    </div>
   );
 }

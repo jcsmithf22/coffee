@@ -1,0 +1,12 @@
+{
+  "name": "coffee",
+  "private": true,
+  "scripts": {
+    "start:backend": "cd backend && bun run dev",
+    "start:frontend": "cd frontend && bun run start",
+    "start": "concurrently \"bun run start:backend\" \"bun run start:frontend\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.1"
+  }
+}
