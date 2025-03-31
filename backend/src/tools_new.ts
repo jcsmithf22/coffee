@@ -194,11 +194,16 @@ export const tools = {
       quantity: z.number().min(1).describe("Quantity to add"),
     }),
     execute: async ({ productVariantID, quantity }) => {
-      const response = await client.cart.setItem({
-        productVariantID,
-        quantity,
-      });
-      return response.data;
+      try {
+        const response = await client.cart.setItem({
+          productVariantID,
+          quantity,
+        });
+        return response.data;
+      } catch (error: any) {
+        return error.message;
+      }
+
     },
   }),
 

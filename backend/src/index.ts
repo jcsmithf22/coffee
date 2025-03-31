@@ -66,7 +66,7 @@ app.post('/generate', zValidator("json", z.custom<Body>()), async c => {
     system: SYSTEM_PROMPT,
     messages,
     tools,
-    maxSteps: 50,
+    maxSteps: 100,
     temperature: 1
   });
 

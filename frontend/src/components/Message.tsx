@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ChatCard } from "./ChatCard";
 import ToolCallMessage from "./ToolCallMessage";
 import type { Message } from "@ai-sdk/react"
-import { streamWords } from '@/lib/utils';
 
 type MessageProps = {
   m: Message
@@ -35,6 +34,18 @@ function TextStream({ text }: TextStreamProps) {
   );
 }
 
+function WordStream({ text }: TextStreamProps) {
+  const wordList = text.split(" ")
+  return (
+    <>
+      {wordList.map((word, index) => (
+        <span key={index} className='fade-in opacity-0'>
+          {word}{" "}
+        </span>
+      ))}
+    </>
+  )
+}
 function Message({ m }: MessageProps) {
   return (
     <div>
@@ -43,14 +54,11 @@ function Message({ m }: MessageProps) {
           // render text parts as simple text:
           case 'text':
             const title = m.role === 'user' ? 'You' : m.role === 'assistant' ? 'Assistant' : m.role;
-            streamWords(part.text, (word) => {
-              console.log("streaming word:", word);
-            });
             return (
               <div key={m.id}>
                 <ChatCard title={title}>
                   {m.role === 'user' ? part.text : (
-                    <TextStream text={part.text} />
+                    <WordStream text={part.text} />
                   )}
                 </ChatCard>
               </div>
