@@ -4,11 +4,19 @@ import {
   redirect,
   useLoaderData,
 } from "@tanstack/react-router";
-import { useRef, useState } from "react";
-import type { LanguageModelV1Prompt } from "ai";
-import SYSTEM_PROMPT from "../lib/system.txt?raw";
+import { useRef, useEffect } from "react";
+import { useAtom } from "jotai";
+import { promptAtom, processingAtom, getInitialPrompt } from "@/lib/atoms";
+import ToolCallMessage from "@/components/ToolCallMessage";
+import { addMessage } from "@/lib/utils";
+import type { GenerateResult, ToolCallResult } from "@/lib/types";
 
 import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { ChatCard } from "@/components/ChatCard";
+import { Send } from "lucide-react";
+
 
 export interface Tool<
   Args extends undefined | StandardSchemaV1 = undefined | StandardSchemaV1,
@@ -17,8 +25,8 @@ export interface Tool<
   description: string;
   args?: Args;
   run: Args extends StandardSchemaV1
-    ? (args: StandardSchemaV1.InferOutput<Args>) => Promise<any>
-    : () => Promise<any>;
+  ? (args: StandardSchemaV1.InferOutput<Args>) => Promise<any>
+  : () => Promise<any>;
 }
 
 type ToolResponse = {
@@ -91,113 +99,48 @@ const providerMetadata = {
   },
 };
 
-// Define initial system messages once
-const getInitialPrompt = (): LanguageModelV1Prompt => [
-  {
-    role: "system",
-    content: SYSTEM_PROMPT,
-    providerMetadata: {
-      anthropic: {
-        cacheControl: {
-          type: "ephemeral",
-        },
-      },
-    },
-  },
-  {
-    role: "system",
-    content: `The current date is ${new Date().toDateString()}`,
-    providerMetadata: {
-      anthropic: {
-        cacheControl: {
-          type: "ephemeral",
-        },
-      },
-    },
-  },
-];
-
 function RouteComponent() {
   const { client, tools } = useLoaderData({ from: Route.id });
+
+  const [prompt, setPrompt] = useAtom(promptAtom);
+  const [processing, setProcessing] = useAtom(processingAtom);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const [store, _setStore] = useState<{
-    prompt: LanguageModelV1Prompt;
-    isProcessing: boolean;
-    rate: boolean;
-  }>({
-    rate: false,
-    prompt: getInitialPrompt(),
-    isProcessing: false,
-  });
-
-  function setStore<K extends keyof typeof store>(
-    key: K,
-    valueOrIndex: any,
-    value?: any
-  ) {
-    _setStore((prev) => {
-      // Handle 2-parameter case (direct replacement)
-      if (value === undefined) {
-        return { ...prev, [key]: valueOrIndex };
-      }
-
-      // Handle 3-parameter case (array update)
-      const currentValue = prev[key];
-      let newArray: any[];
-
-      // Convert to array if not already one
-      if (!Array.isArray(currentValue)) {
-        newArray = currentValue !== undefined ? [currentValue] : [];
-      } else {
-        newArray = [...currentValue];
-      }
-
-      // Handle index bounds
-      const index = Math.max(0, Math.floor(valueOrIndex));
-      if (index >= newArray.length) {
-        // Expand array if index beyond length
-        newArray.length = index + 1;
-      }
-
-      // Update value at index
-      newArray[index] = value;
-
-      return { ...prev, [key]: newArray };
-    });
-  }
+  useEffect(() => {
+    if (rootRef.current) {
+      console.log("scrolling to bottom");
+      rootRef.current.scrollTo(0, rootRef.current.scrollHeight);
+    }
+  }, [prompt.length]);
 
   function clearConversation() {
-    setStore("prompt", getInitialPrompt());
+    setPrompt(getInitialPrompt());
   }
 
+
   async function send(message: string) {
-    setStore("isProcessing", true);
-    setStore("prompt", store.prompt.length, {
-      role: "user",
-      content: [
-        {
-          type: "text",
-          text: message,
-          providerMetadata: store.prompt.length === 1 ? providerMetadata : {},
-        },
-      ],
-    });
+    let newMessage = addMessage(prompt, "user", {
+      type: "text",
+      text: message,
+      providerMetadata: prompt.length === 1 ? providerMetadata : {},
+    })
+
+    setPrompt(newMessage)
+    setProcessing(true);
+
+    if (textareaRef.current) textareaRef.current.value = '';
 
     while (true) {
-      if (!store.isProcessing) {
-        console.log("Processing cancelled by user");
-        break;
-      }
+      console.log("beginning of loop")
 
       const response = await client.generate.$post({
         json: {
-          prompt: store.prompt,
+          prompt: newMessage,
           mode: {
             type: "regular",
-            tools: tools.map((tool: any) => ({
+            tools: (await tools).map((tool: any) => ({
               type: "function",
               name: tool.name,
               description: tool.description,
@@ -209,60 +152,39 @@ function RouteComponent() {
           inputFormat: "messages",
           temperature: 1,
         },
-      });
-
-      if (!store.isProcessing) continue;
+      })
 
       if (!response.ok) {
-        if (response.status === 400) {
-          setStore("prompt", (val) => {
-            val.splice(2, 1);
-            console.log(val);
-            return [...val];
-          });
-        }
-        if (response.status === 429) {
-          setStore("rate", true);
-        }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        continue;
+        console.error("Error:", response);
+        setProcessing(false);
+        break;
       }
 
-      const result = await response.json();
+      const result = await response.json() as GenerateResult;
 
       if (result.text) {
-        setStore("prompt", store.prompt.length, {
-          role: "assistant",
-          content: [
-            {
-              type: "text",
-              text: result.text,
-            },
-          ],
-        });
+        newMessage = addMessage(newMessage, "assistant", {
+          type: "text",
+          text: result.text,
+        })
+        setPrompt(newMessage);
       }
 
-      setStore("rate", false);
-
       if (result.finishReason === "stop") {
-        setStore("isProcessing", false);
-        break;
+        setProcessing(false);
+        break
       }
 
       if (result.finishReason === "tool-calls") {
         for (const item of result.toolCalls!) {
-          console.log("calling tool", item.toolName, item.args);
-          setStore("prompt", store.prompt.length, {
-            role: "assistant",
-            content: [
-              {
-                type: "tool-call",
-                toolName: item.toolName,
-                args: JSON.parse(item.args),
-                toolCallId: item.toolCallId,
-              },
-            ],
-          });
+          console.log("calling tool", item.toolName, item.args)
+          newMessage = addMessage(newMessage, "assistant", {
+            type: "tool-call",
+            toolName: item.toolName,
+            args: JSON.parse(item.args),
+            toolCallId: item.toolCallId,
+          })
+          setPrompt(newMessage);
 
           const response = await client.mcp
             .$post({
@@ -276,26 +198,106 @@ function RouteComponent() {
                 },
               },
             })
-            .then((r) => r.json());
-          if ("content" in response.result) {
-            setStore("prompt", store.prompt.length, {
-              role: "tool",
-              content: [
-                {
-                  type: "tool-result",
-                  toolName: item.toolName,
-                  toolCallId: item.toolCallId,
-                  result: response.result.content,
-                },
-              ],
-            });
-          } else break;
+
+          const { result } = await response.json() as ToolCallResult;
+          if ("content" in result) {
+            console.log("tool result", result)
+            newMessage = addMessage(newMessage, "tool", {
+              type: "tool-result",
+              toolName: item.toolName,
+              toolCallId: item.toolCallId,
+              result: result.content,
+            })
+            setPrompt(newMessage);
+          } else break
         }
       }
+
     }
-    setStore("isProcessing", false);
-    textarea?.focus();
+
   }
 
-  return <div>Hi</div>;
+  return (
+    <div
+      data-component="chat"
+      ref={rootRef}
+      className="p-4 max-w-3xl mx-auto h-[calc(100vh-120px)] overflow-y-auto no-scrollbar"
+    >
+      <div className="mb-4">
+        {prompt
+          .filter(message => message.role !== 'system')
+          .map((message, index) => (
+            <div key={index}>
+              {message.role === "user" && message.content[0].type === "text" && (
+                <ChatCard title="User">
+                  {message.content[0].text}
+                </ChatCard>
+              )}
+
+              {message.role === "assistant" &&
+                message.content[0].type === "tool-call" && (
+                  <ToolCallMessage
+                    key={index}
+                    toolName={message.content[0].toolName}
+                    args={message.content[0].args}
+                  />
+                )}
+
+              {message.role === "assistant" && message.content[0].type === "text" && (
+                <ChatCard title="Assistant">
+                  {message.content[0].text}
+                </ChatCard>
+              )}
+            </div>
+          ))}
+      </div>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (textareaRef.current?.value) {
+            await send(textareaRef.current.value);
+          }
+        }}
+        onKeyDown={(e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+            e.preventDefault();
+            e.currentTarget.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+          }
+        }}
+      >
+        <div className="grid gap-2 bg-secondary p-1.5 border rounded-2xl shadow-sm">
+          <Textarea ref={textareaRef} className="rounded-lg bg-background shadow-lg resize-none" />
+          <div className="flex items-center justify-between">
+            <div>
+
+              {processing && (
+                <div className="text-sm text-muted-foreground ml-2">
+                  Thinking...
+                </div>
+              )
+              }
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="rounded-lg"
+                type="button"
+                onClick={clearConversation}
+              >
+                Clear
+              </Button>
+              <Button
+                className="rounded-lg"
+                size="icon"
+                type="submit"
+                disabled={processing}
+              >
+                <Send className="mr-px" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </form >
+    </div >
+  );
 }
