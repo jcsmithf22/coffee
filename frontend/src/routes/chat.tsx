@@ -11,7 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Send } from "lucide-react";
 import { motion, useScroll, useTransform } from "motion/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/chat")({
   loader: ({ context: { queryClient } }) => {
@@ -21,8 +21,11 @@ export const Route = createFileRoute("/chat")({
   component: RouteComponent,
 });
 
+type TabType = "cart" | "orders" | "subscriptions";
+
 function RouteComponent() {
   // const { queryClient } = useLoaderData({ from: "/chat" })
+  const [tab, setTab] = useState<TabType>("cart")
   const queryClient = useQueryClient();
   const {
     messages,
@@ -37,6 +40,15 @@ function RouteComponent() {
       queryClient.invalidateQueries({ queryKey: ["terminal"], type: "all" })
     },
     async onToolCall({ toolCall }) {
+      if (toolCall.toolName.toLowerCase().includes("cart")) {
+        setTab("cart")
+      }
+      if (toolCall.toolName.toLowerCase().includes("order")) {
+        setTab("orders")
+      }
+      if (toolCall.toolName.toLowerCase().includes("subscription")) {
+        setTab("subscriptions")
+      }
       if (toolCall.toolName === "get_cart") {
         console.log("get_cart tool called");
       }
@@ -63,18 +75,19 @@ function RouteComponent() {
   const { scrollY } = useScroll({ container: scrollRef })
   const shadowHeight = useTransform(scrollY, [20, 60], [0, 1])
 
+
   return (
     <div className="flex bg-secondary overflow-hidden">
-      <div className="h-screen p-2 pb-0 pr-0 w-[560px]">
+      <div className="h-screen p-2 pb-0 pr-0 w-[400px] shrink-0">
         <div className="px-2">
-          <Tabs defaultValue="cart" className="gap-0">
+          <Tabs className="gap-0" value={tab} onValueChange={(value) => setTab(value as TabType)}>
             <TabsList className="grid w-full grid-cols-3 p-0">
               <TabsTrigger className="rounded-2xl" value="cart">Cart</TabsTrigger>
               <TabsTrigger className="rounded-2xl" value="orders">Orders</TabsTrigger>
               <TabsTrigger className="rounded-2xl" value="subscriptions">Subscriptions</TabsTrigger>
             </TabsList>
             <div className="relative -mx-2">
-              <motion.div className="absolute inset-x-0 h-20 overflow-hidden shadow-[inset_0px_30px_25px_-20px_rgba(0,0,0,0.35)] top-2 bg-transparent" style={{
+              <motion.div className="pointer-events-none absolute inset-x-0 h-20 overflow-hidden shadow-[inset_0px_30px_25px_-20px_rgba(0,0,0,0.35)] top-2 bg-transparent" style={{
                 opacity: shadowHeight
               }}></motion.div>
               <svg className="h-4 absolute top-2 left-0 fill-secondary" viewBox="0 0 16 16" preserveAspectRatio="none">
