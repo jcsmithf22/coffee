@@ -16,6 +16,7 @@ import { z } from "zod"
 import { tools } from "./tools_new";
 // @ts-ignore
 import SYSTEM_PROMPT from "./system.txt?raw";
+import { cartQuery, orderQuery, subscriptionQuery } from "./queries";
 
 const models = {
   cohere: createCohere({
@@ -43,23 +44,19 @@ const models = {
 //   model: models.mistral,
 //   tools,
 // });
+//
+type Body = {
+  messages: Message[];
+}
 
-const app = new Hono();
-
-app.use(
+const app = new Hono().use(
   cors({
     origin: "*",
     allowHeaders: ["*"],
     allowMethods: ["GET"],
     credentials: false,
   }),
-)
-
-type Body = {
-  messages: Message[];
-}
-
-app.post('/generate', zValidator("json", z.custom<Body>()), async c => {
+).post('/generate', zValidator("json", z.custom<Body>()), async c => {
   const { messages } = await c.req.valid("json");
   const result = streamText({
     model: models.mistral,
@@ -75,9 +72,23 @@ app.post('/generate', zValidator("json", z.custom<Body>()), async c => {
   c.header('Content-Type', 'text/plain; charset=utf-8');
 
   return stream(c, stream => stream.pipe(result.toDataStream()));
+}).get("/cart", async (c) => {
+  const result = await cartQuery()
+  return c.json(result)
 })
+.get("/order", async (c) => {
+  const result = await orderQuery()
+  return c.json(result)
+})
+.get("/subscription", async (c) => {
+  const result = await subscriptionQuery()
+  return c.json(result)
+})
+
 
 export default {
   port: 4000,
   fetch: app.fetch,
 };
+
+export type App = typeof app

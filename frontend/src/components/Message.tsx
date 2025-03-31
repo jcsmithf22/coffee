@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { ChatCard } from "./ChatCard";
-import ToolCallMessage from "./ToolCallMessage";
+import { memo } from "react";
+import { ChatCard } from "@/components/chat-card";
+import ToolCallMessage from "@/components/tool-call-message";
 import type { Message } from "@ai-sdk/react"
+// import { useRateLimitedCharacters } from "@/hooks/rate-limit";
 
 type MessageProps = {
   m: Message
@@ -11,36 +12,14 @@ interface TextStreamProps {
   text: string;
 }
 
-function TextStream({ text }: TextStreamProps) {
-  const [textParts, setTextParts] = useState<string[]>([]);
-  const prevTextLength = useRef(0);
-
-  useEffect(() => {
-    if (text.length > prevTextLength.current) {
-      const newText = text.slice(prevTextLength.current);
-      setTextParts(prev => [...prev, newText]);
-      prevTextLength.current = text.length;
-    }
-  }, [text])
-
-  return (
-    <>
-      {textParts.map((part, index) => (
-        <span key={index} className="fade-in">
-          {part}
-        </span>
-      ))}
-    </>
-  );
-}
-
 function WordStream({ text }: TextStreamProps) {
-  const wordList = text.split(" ")
+  // const streamedText = useRateLimitedCharacters(text, 0.01)
+  const wordList = text.split("")
   return (
     <>
       {wordList.map((word, index) => (
         <span key={index} className='fade-in opacity-0'>
-          {word}{" "}
+          {word}
         </span>
       ))}
     </>
@@ -95,4 +74,4 @@ function Message({ m }: MessageProps) {
   )
 }
 
-export default React.memo(Message);
+export default memo(Message);

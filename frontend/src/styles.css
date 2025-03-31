@@ -132,21 +132,33 @@ code {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 @layer utilities {
+
   /* Hide scrollbar but keep functionality */
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;     /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 
   /* For Webkit browsers like Chrome/Safari */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+
+  .card-content {
+    max-height: calc(100vh - 3.25rem);
+  }
+
+  .clipped-2xl {
+    clip-path: url(#roundedClipPath);
   }
 }
 
@@ -154,6 +166,7 @@ code {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

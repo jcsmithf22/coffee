@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { client } from "./client";
-import { cartQuery } from "./queries";
+import { cartQuery, orderQuery } from "./queries";
 
 export const tools = {
   // Product Tools
@@ -9,8 +9,12 @@ export const tools = {
     description: "List all available products from Terminal.shop",
     parameters: z.object({}),
     execute: async () => {
-      const products = await client.product.list();
-      return products.data;
+      try {
+        const products = await client.product.list();
+        return products.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -55,8 +59,12 @@ export const tools = {
     description: "Get the current user's profile information",
     parameters: z.object({}),
     execute: async () => {
-      const profile = await client.profile.me();
-      return profile.data;
+      try {
+        const profile = await client.profile.me();
+        return profile.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -67,8 +75,12 @@ export const tools = {
       name: z.string(),
     }),
     execute: async ({ email, name }) => {
-      const profile = await client.profile.update({ email, name });
-      return profile.data;
+      try {
+        const profile = await client.profile.update({ email, name });
+        return profile.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -77,8 +89,12 @@ export const tools = {
     description: "List all saved addresses for the current user",
     parameters: z.object({}),
     execute: async () => {
-      const addresses = await client.address.list();
-      return addresses.data;
+      try {
+        const addresses = await client.address.list();
+        return addresses.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -90,8 +106,12 @@ export const tools = {
         .describe("The address ID (e.g., shp_XXXXXXXXXXXXXXXXXXXXXXXXX)"),
     }),
     execute: async ({ addressId }) => {
-      const address = await client.address.get(addressId);
-      return address.data;
+      try {
+        const address = await client.address.get(addressId);
+        return address.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -106,15 +126,19 @@ export const tools = {
       street2: z.string().optional(),
     }),
     execute: async ({ city, country, name, street1, zip, street2 }) => {
-      const address = await client.address.create({
-        city,
-        country,
-        name,
-        street1,
-        zip,
-        street2,
-      });
-      return address.data;
+      try {
+        const address = await client.address.create({
+          city,
+          country,
+          name,
+          street1,
+          zip,
+          street2,
+        });
+        return address.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -126,8 +150,12 @@ export const tools = {
         .describe("The address ID (e.g., shp_XXXXXXXXXXXXXXXXXXXXXXXXX)"),
     }),
     execute: async ({ addressId }) => {
-      const result = await client.address.delete(addressId);
-      return result.data;
+      try {
+        const result = await client.address.delete(addressId);
+        return result.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -136,8 +164,12 @@ export const tools = {
     description: "List all saved credit cards for the current user",
     parameters: z.object({}),
     execute: async () => {
-      const cards = await client.card.list();
-      return cards.data;
+      try {
+        const cards = await client.card.list();
+        return cards.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -149,8 +181,12 @@ export const tools = {
         .describe("The card ID (e.g., crd_XXXXXXXXXXXXXXXXXXXXXXXXX)"),
     }),
     execute: async ({ cardId }) => {
-      const card = await client.card.get(cardId);
-      return card.data;
+      try {
+        const card = await client.card.get(cardId);
+        return card.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -165,8 +201,12 @@ export const tools = {
         ),
     }),
     execute: async ({ token }) => {
-      const card = await client.card.create({ token });
-      return card.data;
+      try {
+        const card = await client.card.create({ token });
+        return card.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -174,8 +214,12 @@ export const tools = {
     description: "Create a temporary URL for collecting credit card information",
     parameters: z.object({}),
     execute: async () => {
-      const response = await client.card.collect();
-      return response.data;
+      try {
+        const response = await client.card.collect();
+        return response.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -213,8 +257,12 @@ export const tools = {
       addressID: z.string().describe("The address ID to use for shipping"),
     }),
     execute: async ({ addressID }) => {
-      const response = await client.cart.setAddress({ addressID });
-      return response.data;
+      try {
+        const response = await client.cart.setAddress({ addressID });
+        return response.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -224,8 +272,12 @@ export const tools = {
       cardID: z.string().describe("The card ID to use for payment"),
     }),
     execute: async ({ cardID }) => {
-      const response = await client.cart.setCard({ cardID });
-      return response.data;
+      try {
+        const response = await client.cart.setCard({ cardID });
+        return response.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -234,8 +286,12 @@ export const tools = {
       "Convert the current user's cart to an order. Always double check before calling this.",
     parameters: z.object({}),
     execute: async () => {
-      const response = await client.cart.convert();
-      return response.data;
+      try {
+        const response = await client.cart.convert();
+        return response.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -243,8 +299,12 @@ export const tools = {
     description: "Clear all items from the current user's cart",
     parameters: z.object({}),
     execute: async () => {
-      const response = await client.cart.clear();
-      return response.data;
+      try {
+        const response = await client.cart.clear();
+        return response.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -252,10 +312,7 @@ export const tools = {
   list_orders: tool({
     description: "List all orders for the current user",
     parameters: z.object({}),
-    execute: async () => {
-      const orders = await client.order.list();
-      return orders.data;
-    },
+    execute: orderQuery
   }),
 
   get_order: tool({
@@ -266,8 +323,12 @@ export const tools = {
         .describe("The order ID (e.g., ord_XXXXXXXXXXXXXXXXXXXXXXXXX)"),
     }),
     execute: async ({ orderId }) => {
-      const order = await client.order.get(orderId);
-      return order.data;
+      try {
+        const order = await client.order.get(orderId);
+        return order.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -287,12 +348,16 @@ export const tools = {
         ),
     }),
     execute: async ({ addressID, cardID, variants }) => {
-      const order = await client.order.create({
-        addressID,
-        cardID,
-        variants,
-      });
-      return order.data;
+      try {
+        const order = await client.order.create({
+          addressID,
+          cardID,
+          variants,
+        });
+        return order.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -301,8 +366,12 @@ export const tools = {
     description: "List all subscriptions for the current user",
     parameters: z.object({}),
     execute: async () => {
-      const subscriptions = await client.subscription.list();
-      return subscriptions.data;
+      try {
+        const subscriptions = await client.subscription.list();
+        return subscriptions.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 
@@ -314,8 +383,12 @@ export const tools = {
         .describe("The subscription ID (e.g., sub_XXXXXXXXXXXXXXXXXXXXXXXXX)"),
     }),
     execute: async ({ subscriptionId }) => {
-      const subscription = await client.subscription.get(subscriptionId);
-      return subscription.data;
+      try {
+        const subscription = await client.subscription.get(subscriptionId);
+        return subscription.data;
+      } catch (error: any) {
+        return error.message;
+      }
     },
   }),
 

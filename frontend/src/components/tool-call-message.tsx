@@ -21,7 +21,7 @@ export default function ToolCallMessage({
   };
 
   return (
-    <div className="mb-4">
+    <div className="mb-4 isolate">
       <div>
         <div
           className="inset-shadow-sm bg-muted rounded-2xl cursor-pointer w-fit px-3 py-1.5 flex items-center"
