@@ -23,19 +23,21 @@ export const tools = {
     parameters: z.object({
       productId: z
         .string()
-        .describe("The product ID (e.g., prd_XXXXXXXXXXXXXXXXXXXXXXXXX) or variant ID (e.g., var_XXXXXXXXXXXXXXXXXXXXXXXXX)"),
+        .describe(
+          "The product ID (e.g., prd_XXXXXXXXXXXXXXXXXXXXXXXXX) or variant ID (e.g., var_XXXXXXXXXXXXXXXXXXXXXXXXX)",
+        ),
     }),
     execute: async ({ productId }) => {
       try {
         // Check if the ID is a variant ID
-        if (productId.startsWith('var_')) {
+        if (productId.startsWith("var_")) {
           // If it's a variant ID, list all products and find the one with the matching variant
           const productsResponse = await client.product.list();
           const products = productsResponse.data;
 
           // Find the product that contains the variant with the matching ID
           const product = products.find((product) =>
-            product.variants.some((variant) => variant.id === productId)
+            product.variants.some((variant) => variant.id === productId),
           );
 
           if (product) {
@@ -197,7 +199,7 @@ export const tools = {
       token: z
         .string()
         .describe(
-          "Stripe token representing the card (e.g., tok_1N3T00LkdIwHu7ixt44h1F8k)"
+          "Stripe token representing the card (e.g., tok_1N3T00LkdIwHu7ixt44h1F8k)",
         ),
     }),
     execute: async ({ token }) => {
@@ -211,7 +213,8 @@ export const tools = {
   }),
 
   collect_card: tool({
-    description: "Create a temporary URL for collecting credit card information",
+    description:
+      "Create a temporary URL for collecting credit card information",
     parameters: z.object({}),
     execute: async () => {
       try {
@@ -227,15 +230,18 @@ export const tools = {
   get_cart: tool({
     description: "Get the current user's cart contents",
     parameters: z.object({}),
-    execute: cartQuery
+    execute: cartQuery,
   }),
 
   add_cart_item: tool({
     description:
-      "Add an item to the current user's cart. This is the default when a user would like to place an order. Adding items to cart does not automatically place the order.",
+      "Add an item to the current user's cart, or updates the quantity if the item is already in the cart. This is the default when a user would like to place an order. Adding items to cart does not automatically place the order.",
     parameters: z.object({
       productVariantID: z.string().describe("The product variant ID to add"),
-      quantity: z.number().min(1).describe("Quantity to add"),
+      quantity: z
+        .number()
+        .min(0)
+        .describe("Quantity to add. Set to 0 to remove."),
     }),
     execute: async ({ productVariantID, quantity }) => {
       try {
@@ -247,7 +253,6 @@ export const tools = {
       } catch (error: any) {
         return error.message;
       }
-
     },
   }),
 
@@ -312,7 +317,7 @@ export const tools = {
   list_orders: tool({
     description: "List all orders for the current user",
     parameters: z.object({}),
-    execute: orderQuery
+    execute: orderQuery,
   }),
 
   get_order: tool({
@@ -341,10 +346,10 @@ export const tools = {
       variants: z
         .record(
           z.string().describe("Product Variant ID"),
-          z.number().min(1).describe("Quantity")
+          z.number().min(1).describe("Quantity"),
         )
         .describe(
-          "An object mapping product variant IDs to quantities (e.g., { var_XXXXXXXXXXXXXXXXXXXXXXXXX: 1 })"
+          "An object mapping product variant IDs to quantities (e.g., { var_XXXXXXXXXXXXXXXXXXXXXXXXX: 1 })",
         ),
     }),
     execute: async ({ addressID, cardID, variants }) => {
@@ -416,14 +421,20 @@ export const tools = {
         ])
         .describe("Subscription schedule configuration"),
     }),
-    execute: async ({ addressID, cardID, productVariantID, quantity, schedule }) => {
+    execute: async ({
+      addressID,
+      cardID,
+      productVariantID,
+      quantity,
+      schedule,
+    }) => {
       // @ts-ignore
       const subscription = await client.subscription.create({
         addressID,
         cardID,
         productVariantID,
         quantity,
-        schedule
+        schedule,
       });
       return subscription.data;
     },
@@ -435,7 +446,7 @@ export const tools = {
       subscriptionId: z
         .string()
         .describe(
-          "The subscription ID to cancel (e.g., sub_XXXXXXXXXXXXXXXXXXXXXXXXX)"
+          "The subscription ID to cancel (e.g., sub_XXXXXXXXXXXXXXXXXXXXXXXXX)",
         ),
     }),
     execute: async ({ subscriptionId }) => {
@@ -481,7 +492,9 @@ export const tools = {
     parameters: z.object({
       tokenId: z
         .string()
-        .describe("The token ID to delete (e.g., pat_XXXXXXXXXXXXXXXXXXXXXXXXX)"),
+        .describe(
+          "The token ID to delete (e.g., pat_XXXXXXXXXXXXXXXXXXXXXXXXX)",
+        ),
     }),
     execute: async ({ tokenId }) => {
       const result = await client.token.delete(tokenId);

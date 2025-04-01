@@ -11,8 +11,8 @@ import { Hono } from "hono";
 import { streamText, type Message } from "ai";
 import { stream } from "hono/streaming";
 import { cors } from "hono/cors";
-import { zValidator } from "@hono/zod-validator"
-import { z } from "zod"
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import { tools } from "./tools_new";
 // @ts-ignore
 import SYSTEM_PROMPT from "./system.txt?raw";
@@ -47,48 +47,64 @@ const models = {
 //
 type Body = {
   messages: Message[];
-}
+};
 
-const app = new Hono().use(
-  cors({
-    origin: "*",
-    allowHeaders: ["*"],
-    allowMethods: ["GET"],
-    credentials: false,
-  }),
-).post('/generate', zValidator("json", z.custom<Body>()), async c => {
-  const { messages } = await c.req.valid("json");
-  const result = streamText({
-    model: models.mistral,
-    system: SYSTEM_PROMPT,
-    messages,
-    tools,
-    maxSteps: 100,
-    temperature: 1
+const app = new Hono()
+  .use(
+    cors({
+      origin: "*",
+      allowHeaders: ["*"],
+      allowMethods: ["GET"],
+      credentials: false,
+    }),
+  )
+  .post("/generate", zValidator("json", z.custom<Body>()), async (c) => {
+    const { messages } = c.req.valid("json");
+
+    try {
+      const result = streamText({
+        model: models.anthropic,
+        system: SYSTEM_PROMPT,
+        messages,
+        tools,
+        maxSteps: 50,
+        temperature: 1,
+        onFinish(stuff) {
+          console.log("STUFF: ", stuff.finishReason);
+        },
+      });
+      c.header("X-Vercel-AI-Data-Stream", "v1");
+      c.header("Content-Type", "text/plain; charset=utf-8");
+
+      return stream(
+        c,
+        (stream) => stream.pipe(result.toDataStream()),
+        async () => {
+          console.error("Error in stream");
+        },
+      );
+    } catch (error) {
+      console.error("Error in /generate");
+    }
+
+    // Mark the response as a v1 data stream:
+  })
+  .get("/cart", async (c) => {
+    const result = await cartQuery();
+    return c.json(result);
+  })
+  .get("/order", async (c) => {
+    const result = await orderQuery();
+    return c.json(result);
+  })
+  .get("/subscription", async (c) => {
+    const result = await subscriptionQuery();
+    return c.json(result);
   });
-
-  // Mark the response as a v1 data stream:
-  c.header('X-Vercel-AI-Data-Stream', 'v1');
-  c.header('Content-Type', 'text/plain; charset=utf-8');
-
-  return stream(c, stream => stream.pipe(result.toDataStream()));
-}).get("/cart", async (c) => {
-  const result = await cartQuery()
-  return c.json(result)
-})
-.get("/order", async (c) => {
-  const result = await orderQuery()
-  return c.json(result)
-})
-.get("/subscription", async (c) => {
-  const result = await subscriptionQuery()
-  return c.json(result)
-})
-
 
 export default {
   port: 4000,
   fetch: app.fetch,
 };
 
-export type App = typeof app
+export type App = typeof app;

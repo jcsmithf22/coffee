@@ -1,12 +1,12 @@
 import { memo } from "react";
 import { ChatCard } from "@/components/chat-card";
 import ToolCallMessage from "@/components/tool-call-message";
-import type { Message } from "@ai-sdk/react"
+import type { Message } from "@ai-sdk/react";
 // import { useRateLimitedCharacters } from "@/hooks/rate-limit";
 
 type MessageProps = {
-  m: Message
-}
+  m: Message;
+};
 
 interface TextStreamProps {
   text: string;
@@ -14,56 +14,66 @@ interface TextStreamProps {
 
 function WordStream({ text }: TextStreamProps) {
   // const streamedText = useRateLimitedCharacters(text, 0.01)
-  const wordList = text.split("")
+  const wordList = text.split("");
   return (
     <>
       {wordList.map((word, index) => (
-        <span key={index} className='fade-in opacity-0'>
+        <span key={index} className="fade-in opacity-0">
           {word}
         </span>
       ))}
     </>
-  )
+  );
 }
+
 function Message({ m }: MessageProps) {
   return (
     <div>
-      {m.parts?.map(part => {
+      {m.parts?.map((part, index) => {
         switch (part.type) {
           // render text parts as simple text:
-          case 'text':
-            const title = m.role === 'user' ? 'You' : m.role === 'assistant' ? 'Assistant' : m.role;
+          case "text":
+            const title =
+              m.role === "user"
+                ? "You"
+                : m.role === "assistant"
+                  ? "Assistant"
+                  : m.role;
             return (
-              <div key={m.id}>
-                <ChatCard title={title}>
-                  {m.role === 'user' ? part.text : (
-                    <WordStream text={part.text} />
-                  )}
-                </ChatCard>
-              </div>
-            )
-          case 'tool-invocation': {
+              <ChatCard key={index} title={title}>
+                {m.role === "user" ? (
+                  part.text
+                ) : (
+                  <WordStream text={part.text} />
+                )}
+              </ChatCard>
+            );
+          case "tool-invocation": {
             const callId = part.toolInvocation.toolCallId;
             const toolName = part.toolInvocation.toolName;
             const args = part.toolInvocation.args;
 
             switch (part.toolInvocation.state) {
-              case 'partial-call':
+              case "partial-call":
                 return (
                   <div key={callId}>
                     <ToolCallMessage toolName={toolName} args={args} />
                   </div>
                 );
-              case 'call':
+              case "call":
                 return (
                   <div key={callId}>
                     <ToolCallMessage toolName={toolName} args={args} />
                   </div>
                 );
-              case 'result':
+              case "result":
                 return (
                   <div key={callId}>
-                    <ToolCallMessage toolName={toolName} args={args} results={part.toolInvocation.result} />
+                    <ToolCallMessage
+                      toolName={toolName}
+                      args={args}
+                      results={part.toolInvocation.result}
+                    />
                   </div>
                 );
             }
@@ -71,7 +81,7 @@ function Message({ m }: MessageProps) {
         }
       })}
     </div>
-  )
+  );
 }
 
 export default memo(Message);
