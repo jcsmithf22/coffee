@@ -241,7 +241,7 @@ export const tools = {
       quantity: z
         .number()
         .min(0)
-        .describe("Quantity to add. Set to 0 to remove."),
+        .describe("Quantity to add. Set to 0 to remove. This is the total quantity, not the amount you would like to add."),
     }),
     execute: async ({ productVariantID, quantity }) => {
       try {
