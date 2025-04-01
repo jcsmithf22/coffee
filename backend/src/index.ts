@@ -17,6 +17,7 @@ import { tools } from "./tools_new";
 // @ts-ignore
 import SYSTEM_PROMPT from "./system.txt?raw";
 import { cartQuery, orderQuery, subscriptionQuery } from "./queries";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
 const models = {
   cohere: createCohere({
@@ -31,13 +32,16 @@ const models = {
   })("claude-3-7-sonnet-latest"),
   fireworks: createFireworks({
     apiKey: process.env.FIREWORKS_API_KEY,
-  })("accounts/fireworks/models/deepseek-v3"),
+  })("accounts/fireworks/models/deepseek-v3-0324"),
   groq: createGroq({
     apiKey: process.env.GROQ_API_KEY,
   })("llama-3.3-70b-specdec"),
   openai: createOpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   })("gpt-4o"),
+  gemini: createGoogleGenerativeAI({
+    apiKey: process.env.GEMINI_API_KEY,
+  })("gemini-2.5-pro-exp-03-25"),
 };
 
 // const app = create({
@@ -63,31 +67,28 @@ const app = new Hono()
 
     try {
       const result = streamText({
-        model: models.anthropic,
+        model: models.mistral,
         system: SYSTEM_PROMPT,
         messages,
         tools,
         maxSteps: 50,
-        temperature: 1,
-        onFinish(stuff) {
-          console.log("STUFF: ", stuff.finishReason);
-        },
+        temperature: 0,
       });
       c.header("X-Vercel-AI-Data-Stream", "v1");
       c.header("Content-Type", "text/plain; charset=utf-8");
 
       return stream(
         c,
-        (stream) => stream.pipe(result.toDataStream()),
-        async () => {
-          console.error("Error in stream");
-        },
+        (stream) => stream.pipe(result.toDataStream({
+          getErrorMessage(error) {
+            console.log("Error in stream", error)
+            return ""
+          }
+        })),
       );
     } catch (error) {
       console.error("Error in /generate");
     }
-
-    // Mark the response as a v1 data stream:
   })
   .get("/cart", async (c) => {
     const result = await cartQuery();

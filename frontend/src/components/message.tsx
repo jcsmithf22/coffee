@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { ChatCard } from "@/components/chat-card";
 import ToolCallMessage from "@/components/tool-call-message";
 import type { Message } from "@ai-sdk/react";
@@ -15,6 +15,15 @@ interface TextStreamProps {
 function WordStream({ text }: TextStreamProps) {
   // const streamedText = useRateLimitedCharacters(text, 0.01)
   const wordList = text.split("");
+
+  useEffect(() => {
+    console.log("mounted");
+  }, []);
+
+  useEffect(() => {
+    console.log("wordList", wordList.length);
+  }, [wordList]);
+
   return (
     <>
       {wordList.map((word, index) => (
