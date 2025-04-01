@@ -1,11 +1,12 @@
 import Cart from "@/components/cart";
 import Message from "@/components/message";
 import Orders from "@/components/orders";
+import Subscriptions from "@/components/subscriptions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { cartQueryOptions, orderQueryOptions } from "@/lib/queries";
+import { cartQueryOptions, orderQueryOptions, subscriptionQueryOptions } from "@/lib/queries";
 import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/chat")({
   loader: ({ context: { queryClient } }) => {
     queryClient.ensureQueryData(cartQueryOptions)
     queryClient.ensureQueryData(orderQueryOptions)
+    queryClient.ensureQueryData(subscriptionQueryOptions)
   },
   component: RouteComponent,
 });
@@ -119,6 +121,9 @@ function RouteComponent() {
               </TabsContent>
               <TabsContent value="orders" className="">
                 <Orders />
+              </TabsContent>
+              <TabsContent value="subscriptions" className="">
+                <Subscriptions />
               </TabsContent>
             </div>
           </Tabs>

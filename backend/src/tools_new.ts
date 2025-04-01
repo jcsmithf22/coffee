@@ -401,14 +401,29 @@ export const tools = {
         .string()
         .describe("The product variant ID to subscribe to"),
       quantity: z.number().min(1).describe("The quantity for the subscription"),
+      schedule: z
+        .discriminatedUnion("type", [
+          z.object({
+            type: z.literal("fixed").describe("Monthly subscription type"),
+          }),
+          z.object({
+            type: z.literal("weekly").describe("Weekly subscription type"),
+            interval: z
+              .number()
+              .min(1)
+              .describe("Number of weeks between shipments"),
+          }),
+        ])
+        .describe("Subscription schedule configuration"),
     }),
-    execute: async ({ addressID, cardID, productVariantID, quantity }) => {
+    execute: async ({ addressID, cardID, productVariantID, quantity, schedule }) => {
       // @ts-ignore
       const subscription = await client.subscription.create({
         addressID,
         cardID,
         productVariantID,
         quantity,
+        schedule
       });
       return subscription.data;
     },
