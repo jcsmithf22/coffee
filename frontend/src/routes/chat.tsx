@@ -81,18 +81,12 @@ function RouteComponent() {
 
   useEffect(() => {
     if (rootRef.current) {
-      // console.log("scrolling to bottom");
-      // rootRef.current.scrollTo(0, rootRef.current.scrollHeight);
       rootRef.current.scrollTo({
         top: rootRef.current.scrollHeight,
         behavior: "smooth",
       });
     }
   }, [messages]);
-
-  // console.log(status);
-
-  console.log(messages);
 
   return (
     <div className="flex bg-secondary overflow-hidden">

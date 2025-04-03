@@ -2,6 +2,7 @@ import { memo, useEffect } from "react";
 import { ChatCard } from "@/components/chat-card";
 import ToolCallMessage from "@/components/tool-call-message";
 import type { Message } from "@ai-sdk/react";
+import { Markdown } from "@/components/ui/markdown";
 // import { useRateLimitedCharacters } from "@/hooks/rate-limit";
 
 type MessageProps = {
@@ -14,24 +15,17 @@ interface TextStreamProps {
 
 function WordStream({ text }: TextStreamProps) {
   // const streamedText = useRateLimitedCharacters(text, 0.01)
-  const wordList = text.split("");
-
-  useEffect(() => {
-    console.log("mounted");
-  }, []);
-
-  useEffect(() => {
-    console.log("wordList", wordList.length);
-  }, [wordList]);
+  // const wordList = text.split("");
 
   return (
-    <>
-      {wordList.map((word, index) => (
+    <Markdown className="prose text-sm prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-h4:text-small prose-h5:text-xs prose-h6:text-xs fade-in-children">
+      {text}
+      {/* {wordList.map((word, index) => (
         <span key={index} className="fade-in opacity-0">
           {word}
         </span>
-      ))}
-    </>
+      ))} */}
+    </Markdown>
   );
 }
 

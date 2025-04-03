@@ -2,17 +2,32 @@ import { orderQueryOptions } from "@/lib/queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import Coffee from "@/assets/coffee.png";
+import { Button } from "@/components/ui/button";
+import { Copy } from "lucide-react";
+import { handleCopy } from "@/lib/utils";
 
 export default function Orders() {
   const { data } = useSuspenseQuery(orderQueryOptions);
 
   return (
     <div className="text-sm flex flex-col gap-2">
+      {!data.length && (
+        <Card>
+          <CardContent>
+            <div className="flex items-center justify-center h-32">
+              <span className="text-muted-foreground">No orders yet</span>
+            </div>
+          </CardContent>
+        </Card> 
+      )}
       {data.map((order) => (
         <Card key={order.id} className="rounded-2xl shadow-lg">
           <CardContent className="space-y-2">
-            <div className="font-medium mb-4 flex justify-between">
-              Order <span className="text-foreground/60">#{order.id}</span>
+            <div className="font-medium mb-4 flex justify-between items-center">
+              <span className="text-foreground/60">#{order.id}</span>
+              <Button data-component="copy-button" size="icon" variant="outline" className="-m-2" onClick={() => handleCopy(order.id)}>
+                <Copy className="h-4 w-4" />
+              </Button>
             </div>
 
             <div className=" divide-y-1 divide-border">

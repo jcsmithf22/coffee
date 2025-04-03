@@ -29,7 +29,7 @@ const models = {
   ollama: ollama("justinledwards/mistral-small-3.1-Q6_K"),
   anthropic: createAnthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
-  })("claude-3-7-sonnet-latest"),
+  })("claude-3-5-sonnet-latest"),
   fireworks: createFireworks({
     apiKey: process.env.FIREWORKS_API_KEY,
   })("accounts/fireworks/models/deepseek-v3-0324"),

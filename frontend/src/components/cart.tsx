@@ -8,6 +8,11 @@ export default function Cart() {
   return (
     <div className="text-sm">
       <div className="divide-y-1 divide-border">
+        {!data.items && (
+          <div className="flex items-center justify-center h-32">
+            <span className="text-muted-foreground">No items in cart</span>
+          </div>
+        )}
         {data.items.map((item) => (
           <div key={item.id} className="flex items-stretch py-4 gap-4">
             <div className="p-1 bg-secondary rounded-md overflow-hidden w-fit shadow">

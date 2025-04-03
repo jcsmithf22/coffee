@@ -76,7 +76,7 @@ export function Sidebar({ tab, setTab }: SidebarProps) {
           </div>
           <div
             ref={scrollRef}
-            className="card-content overflow-y-scroll overflow-x-visible pb-2 -mx-8 px-8 no-scrollbar mt-2"
+            className="card-content overflow-y-scroll overflow-x-visible pb-8 -mx-8 px-8 no-scrollbar mt-2"
           >
             <TabsContent value="cart" className="pb-4">
               <Card className="rounded-2xl shadow-lg">
