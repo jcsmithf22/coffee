@@ -1,4 +1,4 @@
-import { memo, useEffect } from "react";
+import { memo } from "react";
 import { ChatCard } from "@/components/chat-card";
 import ToolCallMessage from "@/components/tool-call-message";
 import type { Message } from "@ai-sdk/react";
@@ -86,5 +86,7 @@ function Message({ m }: MessageProps) {
     </div>
   );
 }
+
+
 
 export default memo(Message);
