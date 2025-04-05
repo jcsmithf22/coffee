@@ -8,6 +8,8 @@ const ENDPOINT = import.meta.env.DEV
   ? "http://localhost:4000"
   : import.meta.env.VITE_OPENCONTROL_ENDPOINT;
 
+// const ENDPOINT = "http://localhost:4000";
+
 export const client = hc<App>(ENDPOINT || "");
 
 export const fetchCart = async () => {
