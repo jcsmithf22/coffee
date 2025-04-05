@@ -1,8 +1,18 @@
 {
-  "name": "tools",
+  "name": "backend",
+  "type": "module",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "build": "./build.ts"
   },
+ "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts"
+    },
+    "./*": {
+      "types": "./dist/src/*.d.ts"
+    }
+  }, 
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.4",
     "@ai-sdk/cohere": "^1.2.4",
@@ -17,6 +27,7 @@
     "opencontrol": "^0.0.16"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/json-schema": "^7.0.15"
   }
 }

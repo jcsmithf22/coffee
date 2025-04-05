@@ -1,6 +1,5 @@
 {
   "name": "frontend",
-  "private": true,
   "type": "module",
   "scripts": {
     "start": "vite --port 3005",
@@ -40,6 +39,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "backend": "workspace:*",
     "@tailwindcss/typography": "^0.5.16",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",

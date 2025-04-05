@@ -1,7 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 
 import { hc } from "hono/client";
-import type { App } from "@backend/index";
+// import type { App } from "@backend/index";
+import type { App } from "backend";
 
 const ENDPOINT = import.meta.env.DEV
   ? "http://localhost:4000"
