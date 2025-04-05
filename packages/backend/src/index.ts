@@ -67,7 +67,7 @@ const app = new Hono()
 
     try {
       const result = streamText({
-        model: models.mistral,
+        model: models.openai,
         system: SYSTEM_PROMPT,
         messages,
         tools,

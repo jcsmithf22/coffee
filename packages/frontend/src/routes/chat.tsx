@@ -1,7 +1,6 @@
 import { Sidebar } from "@/components/sidebar";
 import Message from "@/components/message";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { ChatInput } from "@/components/chat-input";
 import {
   cartQueryOptions,
   orderQueryOptions,
@@ -10,7 +9,6 @@ import {
 import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/chat")({
@@ -117,67 +115,15 @@ function RouteComponent() {
               <Message key={index} m={m} />
             ))}
 
-            <form
-              onSubmit={handleSubmit}
-              className="fixed bottom-0 w-full max-w-2xl mb-8 z-20"
-            >
-              <div className="grid gap-2 bg-secondary p-1.5 border rounded-2xl shadow-sm">
-                <Textarea
-                  className="rounded-lg bg-background dark:bg-background shadow-lg resize-none"
-                  value={input}
-                  placeholder="Say something..."
-                  onChange={handleInputChange}
-                  onKeyDown={(e) => {
-                    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-                      e.preventDefault();
-                      handleSubmit(e);
-                    }
-                  }}
-                />
-                <div className="flex items-center justify-between">
-                  <div>
-                    {processing && !error && (
-                      <div className="text-sm text-muted-foreground ml-2">
-                        Thinking...
-                      </div>
-                    )}
-                    {error && (
-                      <div className="text-sm text-red-600 ml-2">
-                        Something went wrong.
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {error && (
-                      <Button
-                        variant="outline"
-                        type="button"
-                        onClick={() => reload}
-                      >
-                        Retry
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      className="rounded-lg"
-                      type="button"
-                      onClick={handleClear}
-                      disabled={processing}
-                    >
-                      Clear
-                    </Button>
-                    <Button
-                      className="rounded-lg"
-                      size="icon"
-                      type="submit"
-                      disabled={processing}
-                    >
-                      <Send className="mr-px" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </form>
+            <ChatInput
+              input={input}
+              handleInputChange={handleInputChange}
+              handleSubmit={handleSubmit}
+              handleClear={handleClear}
+              processing={processing}
+              error={error}
+              reload={reload}
+            />
           </div>
         </div>
       </div>
