@@ -13,11 +13,12 @@ import { stream } from "hono/streaming";
 import { cors } from "hono/cors";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { tools } from "./tools_new";
+import { tools } from "./tools";
 // @ts-ignore
 import SYSTEM_PROMPT from "./system.txt?raw";
 import { cartQuery, orderQuery, subscriptionQuery } from "./queries";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 const models = {
   cohere: createCohere({
@@ -33,15 +34,19 @@ const models = {
   fireworks: createFireworks({
     apiKey: process.env.FIREWORKS_API_KEY,
   })("accounts/fireworks/models/deepseek-v3-0324"),
+  // accounts/fireworks/models/llama4-maverick-instruct-basic
   groq: createGroq({
     apiKey: process.env.GROQ_API_KEY,
-  })("llama-3.3-70b-specdec"),
+  })("meta-llama/llama-4-scout-17b-16e-instruct"),
   openai: createOpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   })("gpt-4o"),
   gemini: createGoogleGenerativeAI({
     apiKey: process.env.GEMINI_API_KEY,
   })("gemini-2.5-pro-exp-03-25"),
+  openRouter: createOpenRouter({
+    apiKey: process.env.OPENROUTER_API_KEY,
+  })("openrouter/quasar-alpha"),
 };
 
 // const app = create({
@@ -67,7 +72,7 @@ const app = new Hono()
 
     try {
       const result = streamText({
-        model: models.openai,
+        model: models.openRouter,
         system: SYSTEM_PROMPT,
         messages,
         tools,
@@ -77,14 +82,15 @@ const app = new Hono()
       c.header("X-Vercel-AI-Data-Stream", "v1");
       c.header("Content-Type", "text/plain; charset=utf-8");
 
-      return stream(
-        c,
-        (stream) => stream.pipe(result.toDataStream({
-          getErrorMessage(error) {
-            console.log("Error in stream", error)
-            return ""
-          }
-        })),
+      return stream(c, (stream) =>
+        stream.pipe(
+          result.toDataStream({
+            getErrorMessage(error) {
+              console.log("Error in stream", error);
+              return "";
+            },
+          }),
+        ),
       );
     } catch (error) {
       console.error("Error in /generate");
