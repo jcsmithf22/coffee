@@ -1,4 +1,3 @@
-import { create } from "opencontrol";
 import { createMistral } from "@ai-sdk/mistral";
 import { createCohere } from "@ai-sdk/cohere";
 import { ollama } from "ollama-ai-provider";
@@ -8,7 +7,13 @@ import { createFireworks } from "@ai-sdk/fireworks";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createGroq } from "@ai-sdk/groq";
 import { Hono } from "hono";
-import { streamText, type Message } from "ai";
+import {
+  InvalidToolArgumentsError,
+  NoSuchToolError,
+  streamText,
+  ToolExecutionError,
+  type Message,
+} from "ai";
 import { stream } from "hono/streaming";
 import { cors } from "hono/cors";
 import { zValidator } from "@hono/zod-validator";
@@ -72,7 +77,7 @@ const app = new Hono()
 
     try {
       const result = streamText({
-        model: models.openRouter,
+        model: models.groq,
         system: SYSTEM_PROMPT,
         messages,
         tools,
@@ -86,8 +91,16 @@ const app = new Hono()
         stream.pipe(
           result.toDataStream({
             getErrorMessage(error) {
-              console.log("Error in stream", error);
-              return "";
+              console.error("Error here");
+              if (NoSuchToolError.isInstance(error)) {
+                return "The model tried to call a unknown tool.";
+              } else if (InvalidToolArgumentsError.isInstance(error)) {
+                return "The model called a tool with invalid arguments.";
+              } else if (ToolExecutionError.isInstance(error)) {
+                return "An error occurred during tool execution.";
+              } else {
+                return "An unknown error occurred.";
+              }
             },
           }),
         ),

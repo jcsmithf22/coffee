@@ -32,14 +32,14 @@ export function Sidebar({ tab, setTab }: SidebarProps) {
           value={tab}
           onValueChange={(value) => setTab(value as TabType)}
         >
-          <TabsList className="grid w-full grid-cols-3 p-0">
-            <TabsTrigger className="rounded-2xl" value="cart">
+          <TabsList className="grid w-full grid-cols-3 bg-white rounded-2xl border shadow-lg h-12 p-1">
+            <TabsTrigger className="rounded-lg" value="cart">
               Cart
             </TabsTrigger>
-            <TabsTrigger className="rounded-2xl" value="orders">
+            <TabsTrigger className="rounded-lg" value="orders">
               Orders
             </TabsTrigger>
-            <TabsTrigger className="rounded-2xl" value="subscriptions">
+            <TabsTrigger className="rounded-lg" value="subscriptions">
               Subscriptions
             </TabsTrigger>
           </TabsList>

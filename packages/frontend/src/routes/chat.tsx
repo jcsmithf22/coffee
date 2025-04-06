@@ -30,6 +30,7 @@ function RouteComponent() {
     messages,
     input,
     handleInputChange,
+    setInput,
     handleSubmit,
     status,
     setMessages,
@@ -118,11 +119,13 @@ function RouteComponent() {
             <ChatInput
               input={input}
               handleInputChange={handleInputChange}
+              setInputValue={setInput}
               handleSubmit={handleSubmit}
               handleClear={handleClear}
               processing={processing}
               error={error}
               reload={reload}
+              messages={messages}
             />
           </div>
         </div>

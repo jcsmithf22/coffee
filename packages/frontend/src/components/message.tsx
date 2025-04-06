@@ -4,6 +4,10 @@ import ToolCallMessage from "@/components/tool-call-message";
 import type { Message } from "@ai-sdk/react";
 // import { Markdown } from "@/components/ui/markdown";
 // import { useRateLimitedCharacters } from "@/hooks/rate-limit";
+import Terminal from "@/assets/icon.png";
+// import User from "@/assets/user.png";
+// import System from "@/assets/system.png";
+// import Data from "@/assets/data.png";
 
 type MessageProps = {
   m: Message;
@@ -31,6 +35,21 @@ function WordStream({ text }: TextStreamProps) {
   );
 }
 
+type RoleMapping = {
+  [key: string]: {
+    title: string;
+    icon?: string;
+  };
+};
+
+// Map of roles to their respective icons and titles
+const roleMapping: RoleMapping = {
+  user: { title: "You" },
+  assistant: { title: "terminal", icon: Terminal },
+  system: { title: "System" },
+  data: { title: "Data" },
+};
+
 function Message({ m }: MessageProps) {
   return (
     <div>
@@ -38,14 +57,17 @@ function Message({ m }: MessageProps) {
         switch (part.type) {
           // render text parts as simple text:
           case "text":
-            const title =
-              m.role === "user"
-                ? "You"
-                : m.role === "assistant"
-                  ? "Assistant"
-                  : m.role;
+            const role = m.role as keyof typeof roleMapping;
+            const roleDetails = roleMapping[role] || {
+              title: m.role,
+              icon: undefined,
+            };
             return (
-              <ChatCard key={index} title={title}>
+              <ChatCard
+                key={index}
+                title={roleDetails.title}
+                icon={roleDetails.icon}
+              >
                 {m.role === "user" ? (
                   part.text
                 ) : (
