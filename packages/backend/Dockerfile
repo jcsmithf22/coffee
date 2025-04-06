@@ -1,22 +1,11 @@
-FROM oven/bun:1
+FROM oven/bun
 
-WORKDIR /app
-
-# Copy package files
-COPY package.json .
 COPY bun.lock .
+COPY package.json .
 
-# Install dependencies
 RUN bun install --frozen-lockfile
 
-# Copy source code
 COPY . .
 
-# Build the application
-RUN bun run build
-
-# Expose the port (assuming default Hono port)
 EXPOSE 4000
-
-# Start the server
-CMD ["bun", "run", "src/index.ts"]
+CMD ["bun", "index.ts"]
