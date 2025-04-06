@@ -40,6 +40,9 @@ function RouteComponent() {
     api: "http://localhost:4000/generate",
     maxSteps: 50,
     onFinish() {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
       queryClient.invalidateQueries({ queryKey: ["terminal"], type: "all" });
     },
     onError(error) {
@@ -75,6 +78,7 @@ function RouteComponent() {
   };
 
   const rootRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const processing = status !== "ready" && status !== "error";
 
@@ -86,6 +90,13 @@ function RouteComponent() {
       });
     }
   }, [messages]);
+
+  // Focus the input on page load and after interaction completes
+  // useEffect(() => {
+  //   if (inputRef.current) {
+  //     inputRef.current.focus();
+  //   }
+  // }, [status]);
 
   return (
     <div className="flex bg-secondary overflow-hidden">
@@ -126,6 +137,7 @@ function RouteComponent() {
               error={error}
               reload={reload}
               messages={messages}
+              inputRef={inputRef}
             />
           </div>
         </div>

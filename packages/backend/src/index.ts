@@ -77,7 +77,7 @@ const app = new Hono()
 
     try {
       const result = streamText({
-        model: models.groq,
+        model: models.openRouter,
         system: SYSTEM_PROMPT,
         messages,
         tools,

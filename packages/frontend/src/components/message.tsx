@@ -5,7 +5,7 @@ import type { Message } from "@ai-sdk/react";
 // import { Markdown } from "@/components/ui/markdown";
 // import { useRateLimitedCharacters } from "@/hooks/rate-limit";
 import Terminal from "@/assets/icon.png";
-// import User from "@/assets/user.png";
+import User from "@/assets/user.png";
 // import System from "@/assets/system.png";
 // import Data from "@/assets/data.png";
 
@@ -44,7 +44,7 @@ type RoleMapping = {
 
 // Map of roles to their respective icons and titles
 const roleMapping: RoleMapping = {
-  user: { title: "You" },
+  user: { title: "You", icon: User },
   assistant: { title: "terminal", icon: Terminal },
   system: { title: "System" },
   data: { title: "Data" },

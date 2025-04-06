@@ -14,6 +14,7 @@ interface ChatInputProps {
   error: Error | undefined;
   reload: () => void;
   messages?: Array<any>;
+  inputRef: React.RefObject<HTMLTextAreaElement | null>;
 }
 
 export function ChatInput({
@@ -26,6 +27,7 @@ export function ChatInput({
   error,
   reload,
   messages = [],
+  inputRef,
 }: ChatInputProps) {
   return (
     <div className="fixed bottom-0 w-full max-w-2xl mb-8 z-20">
@@ -34,7 +36,12 @@ export function ChatInput({
           {promptSuggestions.map((suggestion, index) => (
             <PromptSuggestion
               key={index}
-              onClick={() => setInputValue(suggestion.prompt)}
+              onClick={() => {
+                if (inputRef.current) {
+                  inputRef.current.focus();
+                }
+                setInputValue(suggestion.prompt);
+              }}
             >
               {suggestion.text}
             </PromptSuggestion>
@@ -44,6 +51,8 @@ export function ChatInput({
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="grid gap-2 bg-secondary p-1.5 border rounded-2xl shadow-sm">
           <Textarea
+            ref={inputRef}
+            autoFocus
             className="rounded-lg bg-background dark:bg-background shadow-lg resize-none"
             value={input}
             placeholder="Say something..."
