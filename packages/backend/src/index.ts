@@ -22,7 +22,6 @@ import { tools } from "./tools";
 // @ts-ignore
 import SYSTEM_PROMPT from "./system.txt?raw";
 import { cartQuery, orderQuery, subscriptionQuery } from "./queries";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 const models = {
@@ -46,9 +45,6 @@ const models = {
   openai: createOpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   })("gpt-4o"),
-  gemini: createGoogleGenerativeAI({
-    apiKey: process.env.GEMINI_API_KEY,
-  })("gemini-2.5-pro-exp-03-25"),
   openRouter: createOpenRouter({
     apiKey: process.env.OPENROUTER_API_KEY,
   })("openrouter/quasar-alpha"),
