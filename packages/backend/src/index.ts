@@ -1,5 +1,6 @@
 import { createMistral } from "@ai-sdk/mistral";
 import { createCohere } from "@ai-sdk/cohere";
+import { createCerebras } from "@ai-sdk/cerebras";
 import { ollama } from "ollama-ai-provider";
 /* import { tools } from "./tools"; */
 import { createAnthropic } from "@ai-sdk/anthropic";
@@ -45,6 +46,9 @@ const models = {
   openai: createOpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   })("gpt-4o"),
+  cerebras: createCerebras({
+    apiKey: process.env.CEREBRAS_API_KEY,
+  })("llama3.3-70b"),
   openRouter: createOpenRouter({
     apiKey: process.env.OPENROUTER_API_KEY,
   })("openrouter/quasar-alpha"),

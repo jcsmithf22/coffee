@@ -31,6 +31,7 @@
     "packages/frontend": {
       "name": "frontend",
       "dependencies": {
+        "@ai-sdk/cerebras": "^0.2.6",
         "@ai-sdk/react": "^1.2.5",
         "@modelcontextprotocol/sdk": "^1.8.0",
         "@radix-ui/react-slot": "^1.1.2",
@@ -79,6 +80,8 @@
   },
   "packages": {
     "@ai-sdk/anthropic": ["@ai-sdk/anthropic@1.2.6", "", { "dependencies": { "@ai-sdk/provider": "1.1.0", "@ai-sdk/provider-utils": "2.2.4" }, "peerDependencies": { "zod": "^3.0.0" } }, "sha512-Mt8ZSkhwnKHfwPPIviv3xgRE/nch2Mu4Fdh7oJDJvPDRJ6tNidCJd3TMwdlrlzPskF7hxCmXmd36yBgZZgt4cA=="],
+
+    "@ai-sdk/cerebras": ["@ai-sdk/cerebras@0.2.6", "", { "dependencies": { "@ai-sdk/openai-compatible": "0.2.6", "@ai-sdk/provider": "1.1.0", "@ai-sdk/provider-utils": "2.2.4" }, "peerDependencies": { "zod": "^3.0.0" } }, "sha512-XpVqq5462HyQPT55Ptpdb0pwti3fbLOZGDeWgxkSwJTzC+fCzDLZFLJKDCINhiMzD+8CAQPQ/qm9+inFZaF0Og=="],
 
     "@ai-sdk/cohere": ["@ai-sdk/cohere@1.2.5", "", { "dependencies": { "@ai-sdk/provider": "1.1.0", "@ai-sdk/provider-utils": "2.2.4" }, "peerDependencies": { "zod": "^3.0.0" } }, "sha512-XiKufmrJXWtiJXwwL394lj2KfwjwJixLiBZdi9okV679WLgfA0DX3MBJwiY8KOmzCR6UaXmZ5vXvVg4NG8wCBQ=="],
 

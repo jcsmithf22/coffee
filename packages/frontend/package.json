@@ -8,6 +8,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@ai-sdk/cerebras": "^0.2.6",
     "@ai-sdk/react": "^1.2.5",
     "@modelcontextprotocol/sdk": "^1.8.0",
     "@radix-ui/react-slot": "^1.1.2",
