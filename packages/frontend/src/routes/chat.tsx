@@ -83,12 +83,14 @@ function RouteComponent() {
   const processing = status !== "ready" && status !== "error";
 
   useEffect(() => {
-    if (rootRef.current) {
-      rootRef.current.scrollTo({
-        top: rootRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
+    requestAnimationFrame(() => {
+      if (rootRef.current) {
+        rootRef.current.scrollTo({
+          top: rootRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    });
   }, [messages]);
 
   // Focus the input on page load and after interaction completes

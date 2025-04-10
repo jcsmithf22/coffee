@@ -241,7 +241,9 @@ export const tools = {
       quantity: z
         .number()
         .min(0)
-        .describe("Quantity to add. Set to 0 to remove. This is the total quantity, not the amount you would like to add."),
+        .describe(
+          "Quantity to add. Set to 0 to remove. This is the total quantity, not the amount you would like to add.",
+        ),
     }),
     execute: async ({ productVariantID, quantity }) => {
       try {
@@ -398,7 +400,8 @@ export const tools = {
   }),
 
   create_subscription: tool({
-    description: "Create a new subscription for the current user",
+    description:
+      "Create a new subscription for the current user, or update an existing one",
     parameters: z.object({
       addressID: z.string().describe("The shipping address ID"),
       cardID: z.string().describe("The payment card ID"),

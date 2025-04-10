@@ -22,7 +22,7 @@ interface SidebarProps {
 export function Sidebar({ tab, setTab }: SidebarProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll({ container: scrollRef });
-  const shadowHeight = useTransform(scrollY, [20, 60], [0, 1]);
+  const shadowHeight = useTransform(scrollY, [0, 40], [0, 1]);
 
   return (
     <div className="h-screen p-2 pb-0 pr-0 w-[400px] shrink-0">
@@ -33,13 +33,17 @@ export function Sidebar({ tab, setTab }: SidebarProps) {
           onValueChange={(value) => setTab(value as TabType)}
         >
           <TabsList className="grid w-full grid-cols-3 bg-white rounded-2xl border shadow-lg h-12 p-1">
-            <TabsTrigger className="rounded-lg" value="cart">
+            <TabsTrigger current={tab} className="rounded-lg" value="cart">
               Cart
             </TabsTrigger>
-            <TabsTrigger className="rounded-lg" value="orders">
+            <TabsTrigger current={tab} className="rounded-lg" value="orders">
               Orders
             </TabsTrigger>
-            <TabsTrigger className="rounded-lg" value="subscriptions">
+            <TabsTrigger
+              current={tab}
+              className="rounded-lg"
+              value="subscriptions"
+            >
               Subscriptions
             </TabsTrigger>
           </TabsList>
@@ -74,10 +78,7 @@ export function Sidebar({ tab, setTab }: SidebarProps) {
               <div className="bg-black/15 size-full"></div>
             </motion.div>
           </div>
-          <div
-            ref={scrollRef}
-            className="card-content overflow-y-scroll overflow-x-visible pb-8 -mx-8 px-8 no-scrollbar mt-2"
-          >
+          <div className="card-content overflow-y-scroll overflow-x-visible pb-8 -mx-8 px-8 no-scrollbar mt-2">
             <TabsContent value="cart" className="pb-4">
               <Card className="rounded-2xl shadow-lg">
                 <CardHeader>

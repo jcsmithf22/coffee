@@ -1,14 +1,15 @@
 import { createMistral } from "@ai-sdk/mistral";
 import { createCohere } from "@ai-sdk/cohere";
-import { createCerebras } from "@ai-sdk/cerebras";
 import { ollama } from "ollama-ai-provider";
-/* import { tools } from "./tools"; */
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createFireworks } from "@ai-sdk/fireworks";
-import { createOpenAI } from "@ai-sdk/openai";
+import { createOpenAI, openai } from "@ai-sdk/openai";
 import { createGroq } from "@ai-sdk/groq";
+import { createCerebras } from "@ai-sdk/cerebras";
+import { createXai } from "@ai-sdk/xai";
 import { Hono } from "hono";
 import {
+  generateObject,
   InvalidToolArgumentsError,
   NoSuchToolError,
   streamText,
@@ -39,26 +40,26 @@ const models = {
   fireworks: createFireworks({
     apiKey: process.env.FIREWORKS_API_KEY,
   })("accounts/fireworks/models/deepseek-v3-0324"),
-  // accounts/fireworks/models/llama4-maverick-instruct-basic
   groq: createGroq({
     apiKey: process.env.GROQ_API_KEY,
-  })("meta-llama/llama-4-scout-17b-16e-instruct"),
+  })("meta-llama/llama-4-maverick-17b-128e-instruct"),
+  // meta-llama/llama-4-scout-17b-16e-instruct
+  // meta-llama/llama-4-maverick-17b-128e-instruct
   openai: createOpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   })("gpt-4o"),
-  cerebras: createCerebras({
-    apiKey: process.env.CEREBRAS_API_KEY,
-  })("llama3.3-70b"),
   openRouter: createOpenRouter({
     apiKey: process.env.OPENROUTER_API_KEY,
+    // })("mistral/ministral-8b"),
   })("openrouter/quasar-alpha"),
+  cerebras: createCerebras({
+    apiKey: process.env.CEREBRAS_API_KEY,
+  })("llama-4-scout-17b-16e-instruct"),
+  grok: createXai({
+    apiKey: process.env.GROK_API_KEY,
+  })("grok-3-fast-beta"),
 };
 
-// const app = create({
-//   model: models.mistral,
-//   tools,
-// });
-//
 type Body = {
   messages: Message[];
 };
@@ -77,7 +78,7 @@ const app = new Hono()
 
     try {
       const result = streamText({
-        model: models.openRouter,
+        model: models.grok,
         system: SYSTEM_PROMPT,
         messages,
         tools,
@@ -91,7 +92,7 @@ const app = new Hono()
         stream.pipe(
           result.toDataStream({
             getErrorMessage(error) {
-              console.error("Error here");
+              console.error(error);
               if (NoSuchToolError.isInstance(error)) {
                 return "The model tried to call a unknown tool.";
               } else if (InvalidToolArgumentsError.isInstance(error)) {
