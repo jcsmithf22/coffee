@@ -3,7 +3,7 @@ import { createCohere } from "@ai-sdk/cohere";
 import { ollama } from "ollama-ai-provider";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createFireworks } from "@ai-sdk/fireworks";
-import { createOpenAI, openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { createGroq } from "@ai-sdk/groq";
 import { createCerebras } from "@ai-sdk/cerebras";
 import { createXai } from "@ai-sdk/xai";

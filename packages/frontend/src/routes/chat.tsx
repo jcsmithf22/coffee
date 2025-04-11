@@ -93,13 +93,6 @@ function RouteComponent() {
     });
   }, [messages]);
 
-  // Focus the input on page load and after interaction completes
-  // useEffect(() => {
-  //   if (inputRef.current) {
-  //     inputRef.current.focus();
-  //   }
-  // }, [status]);
-
   return (
     <div className="flex bg-secondary overflow-hidden">
       <Sidebar tab={tab} setTab={setTab} />

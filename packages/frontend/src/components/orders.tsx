@@ -18,14 +18,20 @@ export default function Orders() {
               <span className="text-muted-foreground">No orders yet</span>
             </div>
           </CardContent>
-        </Card> 
+        </Card>
       )}
       {data.map((order) => (
         <Card key={order.id} className="rounded-2xl shadow-lg">
           <CardContent className="space-y-2">
             <div className="font-medium mb-4 flex justify-between items-center">
               <span className="text-foreground/60">#{order.id}</span>
-              <Button data-component="copy-button" size="icon" variant="outline" className="-m-2" onClick={() => handleCopy(order.id)}>
+              <Button
+                data-component="copy-button"
+                size="icon"
+                variant="outline"
+                className="-m-2"
+                onClick={() => handleCopy(order.id)}
+              >
                 <Copy className="h-4 w-4" />
               </Button>
             </div>
