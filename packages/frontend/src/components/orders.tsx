@@ -3,11 +3,15 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import Coffee from "@/assets/coffee.png";
 import { Button } from "@/components/ui/button";
-import { Copy } from "lucide-react";
+import { Copy, ChevronDown } from "lucide-react";
 import { handleCopy } from "@/lib/utils";
+import { useState } from "react";
 
 export default function Orders() {
   const { data } = useSuspenseQuery(orderQueryOptions);
+  const [showAll, setShowAll] = useState(false);
+
+  const displayedOrders = showAll ? data : data.slice(0, 3);
 
   return (
     <div className="text-sm flex flex-col gap-2">
@@ -20,7 +24,7 @@ export default function Orders() {
           </CardContent>
         </Card>
       )}
-      {data.map((order) => (
+      {displayedOrders.map((order) => (
         <Card key={order.id} className="rounded-2xl shadow-lg">
           <CardContent className="space-y-2">
             <div className="font-medium mb-4 flex justify-between items-center">
@@ -90,6 +94,20 @@ export default function Orders() {
           </CardContent>
         </Card>
       ))}
+      {data.length > 3 && (
+        <div className="flex justify-center">
+          <Button
+            variant="outline"
+            className="rounded-2xl hover:bg-background/50"
+            onClick={() => setShowAll(!showAll)}
+          >
+            {showAll ? "Show less" : "Show all orders"}
+            <ChevronDown
+              className={`size-4 transition-transform ${showAll ? "rotate-180" : ""}`}
+            />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
